@@ -1,4 +1,16 @@
 require('dotenv').config();
+
+// Polyfills para evitar que o pdfjs-dist (usado pelo pdf-parse) quebre em ambiente Node.js na VPS
+if (typeof global.DOMMatrix === 'undefined') {
+  global.DOMMatrix = class DOMMatrix {};
+}
+if (typeof global.ImageData === 'undefined') {
+  global.ImageData = class ImageData {};
+}
+if (typeof global.Path2D === 'undefined') {
+  global.Path2D = class Path2D {};
+}
+
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
