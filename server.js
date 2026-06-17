@@ -19,6 +19,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const pdfParse = require('pdf-parse');
 const db = require('./database');
+const mammoth = require('mammoth');
 
 // Helper para extrair texto de PDF suportando diferentes versões da biblioteca pdf-parse
 async function extractTextFromPdf(dataBuffer) {
@@ -32,6 +33,12 @@ async function extractTextFromPdf(dataBuffer) {
   } else {
     throw new Error('Não foi possível inicializar a biblioteca pdf-parse.');
   }
+}
+
+// Helper para extrair texto de DOCX usando a biblioteca mammoth
+async function extractTextFromDocx(filePath) {
+  const result = await mammoth.extractRawText({ path: filePath });
+  return result.value;
 }
 
 const app = express();
@@ -657,59 +664,49 @@ Importante:
 - Escreva a resposta em português do Brasil.
     `;
 
-    let extractedData;
-    if (provider === 'openai') {
-      console.log(`[OpenAI PDF Onboarding] Lendo PDF local com pdf-parse...`);
-      const dataBuffer = fs.readFileSync(file.path);
-      const pdfText = await extractTextFromPdf(dataBuffer);
+    let extractedText = '';
+    const extension = path.extname(file.originalname).toLowerCase();
 
-      console.log(`[OpenAI PDF Onboarding] Solicitando extração de dados estruturados do texto...`);
-      const responseText = await callOpenAI([
+    if (extension === '.pdf') {
+      console.log(`[Onboarding] Extraindo texto de PDF...`);
+      const dataBuffer = fs.readFileSync(file.path);
+      extractedText = await extractTextFromPdf(dataBuffer);
+    } else if (extension === '.docx') {
+      console.log(`[Onboarding] Extraindo texto de DOCX...`);
+      extractedText = await extractTextFromDocx(file.path);
+    } else if (extension === '.txt' || extension === '.md') {
+      console.log(`[Onboarding] Lendo arquivo de texto/markdown...`);
+      extractedText = fs.readFileSync(file.path, 'utf8');
+    } else {
+      return res.status(400).json({ error: 'Formato de arquivo não suportado. Envie PDF, DOCX, TXT ou MD.' });
+    }
+
+    if (!extractedText || extractedText.trim().length === 0) {
+      return res.status(400).json({ error: 'O arquivo enviado parece estar vazio ou não contém texto legível.' });
+    }
+
+    let extractedData;
+    let responseText = '';
+
+    if (provider === 'openai') {
+      console.log(`[OpenAI Onboarding] Solicitando extração de dados estruturados...`);
+      responseText = await callOpenAI([
         {
           role: 'system',
           content: 'Você é um assistente de marketing experiente que extrai briefings comerciais em formato JSON estruturado.'
         },
         {
           role: 'user',
-          content: `Aqui está o texto extraído do documento de onboarding em PDF do cliente "${client.name}":\n\n${pdfText}\n\n${onboardPrompt}`
+          content: `Aqui está o texto extraído do documento de onboarding do cliente "${client.name}":\n\n${extractedText}\n\n${onboardPrompt}`
         }
       ], true);
-
-      // Limpar potenciais invólucros markdown do JSON
-      let cleanedJsonText = responseText.trim();
-      if (cleanedJsonText.startsWith('```')) {
-        cleanedJsonText = cleanedJsonText.replace(/^```json/i, '').replace(/```$/, '').trim();
-      }
-
-      extractedData = JSON.parse(cleanedJsonText);
-
     } else {
       // Gemini flow
       if (!apiKey || !genAI) {
         return res.status(500).json({ error: 'A chave de API do Gemini não está configurada no servidor.' });
       }
 
-      console.log(`[Gemini PDF Onboarding] Enviando PDF: ${file.filename}`);
-      const uploadResult = await fileManager.uploadFile(file.path, {
-        mimeType: 'application/pdf',
-        displayName: `onboard_${clientId}_${Date.now()}`
-      });
-      console.log(`[Gemini PDF Onboarding] Upload concluído. URI: ${uploadResult.file.uri}`);
-
-      // Aguarda o PDF ficar ativo
-      let fileState = await fileManager.getFile(uploadResult.file.name);
-      let attempts = 0;
-      while (fileState.state === 'PROCESSING' && attempts < 30) {
-        console.log(`[Gemini PDF Onboarding] PDF em processamento. Aguardando 2 segundos...`);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        fileState = await fileManager.getFile(uploadResult.file.name);
-        attempts++;
-      }
-      if (fileState.state === 'FAILED') {
-        throw new Error('O processamento do PDF falhou nos servidores do Gemini.');
-      }
-      console.log(`[Gemini PDF Onboarding] PDF ativo para extração.`);
-
+      console.log(`[Gemini Onboarding] Solicitando extração de dados estruturados com Gemini...`);
       const model = genAI.getGenerativeModel({
         model: 'gemini-2.5-flash',
         generationConfig: {
@@ -717,36 +714,27 @@ Importante:
         }
       });
 
-      console.log(`[Gemini PDF Onboarding] Solicitando extração de dados estruturados...`);
       const result = await model.generateContent([
-        {
-          fileData: {
-            fileUri: uploadResult.file.uri,
-            mimeType: uploadResult.file.mimeType
-          }
-        },
-        { text: onboardPrompt }
+        { text: `Aqui está o texto extraído do documento de onboarding do cliente "${client.name}":\n\n${extractedText}\n\n${onboardPrompt}` }
       ]);
 
-      const responseText = result.response.text();
-      console.log(`[Gemini PDF Onboarding] Resposta estruturada recebida.`);
-      extractedData = JSON.parse(responseText);
-
-      // Limpar o PDF da File API do Gemini
-      try {
-        await fileManager.deleteFile(uploadResult.file.name);
-        console.log(`[Gemini PDF Onboarding] Limpeza concluída.`);
-      } catch (err) {
-        console.error('Erro ao limpar arquivo do Gemini:', err);
-      }
+      responseText = result.response.text();
     }
+
+    // Limpar potenciais invólucros markdown do JSON
+    let cleanedJsonText = responseText.trim();
+    if (cleanedJsonText.startsWith('```')) {
+      cleanedJsonText = cleanedJsonText.replace(/^```json/i, '').replace(/```$/, '').trim();
+    }
+
+    extractedData = JSON.parse(cleanedJsonText);
 
     // 3. Atualizar o cliente no Directus mesclando com os dados novos
     const currentNotes = client.notes ? client.notes.trim() : '';
     const newNotes = extractedData.notes || '';
     const updatedNotes = currentNotes 
-      ? `${currentNotes}\n\n### 📄 Aprendizados do Onboarding (Extraído via PDF em ${new Date().toLocaleDateString('pt-BR')}):\n${newNotes}`
-      : `### 📄 Aprendizados do Onboarding (Extraído via PDF em ${new Date().toLocaleDateString('pt-BR')}):\n${newNotes}`;
+      ? `${currentNotes}\n\n### 📄 Aprendizados do Onboarding (Extraído via Documento em ${new Date().toLocaleDateString('pt-BR')}):\n${newNotes}`
+      : `### 📄 Aprendizados do Onboarding (Extraído via Documento em ${new Date().toLocaleDateString('pt-BR')}):\n${newNotes}`;
 
     await db.updateClient(clientId, {
       name: client.name,

@@ -261,11 +261,11 @@
                 </div>
 
                 <div class="info-group onboarding-box margin-top" style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); padding: 16px; border-radius: 12px;">
-                  <h3>📄 Ensinar IA com Briefing (PDF)</h3>
-                  <p class="text-muted" style="font-size: 12px; margin-bottom: 12px; line-height: 1.5;">Suba um PDF (onboarding, briefing ou manual) e a IA definirá o público, objetivos e tom de voz automaticamente.</p>
+                  <h3>📄 Ensinar IA com Briefing (PDF, Word, TXT, MD)</h3>
+                  <p class="text-muted" style="font-size: 12px; margin-bottom: 12px; line-height: 1.5;">Suba um arquivo de briefing (PDF, Word, TXT ou Markdown) e a IA definirá o público, objetivos e tom de voz automaticamente.</p>
                   <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="file" id="input-client-onboard-pdf" accept=".pdf" style="display: none;">
-                    <button class="btn btn-secondary btn-sm" id="btn-trigger-pdf-upload">Selecionar PDF</button>
+                    <input type="file" id="input-client-onboard-pdf" accept=".pdf,.docx,.txt,.md" style="display: none;">
+                    <button class="btn btn-secondary btn-sm" id="btn-trigger-pdf-upload">Selecionar Arquivo</button>
                     <span id="selected-pdf-name" class="text-muted" style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Nenhum arquivo selecionado</span>
                     <button class="btn btn-primary btn-sm hidden" id="btn-upload-onboard-pdf">Processar Documento</button>
                   </div>
@@ -273,7 +273,7 @@
                     <div style="display: inline-block; vertical-align: middle; margin-right: 8px;">
                       <div class="loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
                     </div>
-                    <span id="pdf-status-text">Lendo documento com Gemini...</span>
+                    <span id="pdf-status-text">Lendo documento com IA...</span>
                   </div>
                 </div>
               </div>
