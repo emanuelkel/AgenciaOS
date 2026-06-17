@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgênciaOS - Central de Inteligência de Marketing</title>
+  <!-- Google Fonts: Montserrat, Poppins & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-theme');
+    }
+  </script>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="logo-text">Agência<span>OS</span></span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" id="nav-dashboard" data-tab="tab-dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Painel Geral
+        </a>
+        <a href="#" class="nav-link" id="nav-clients" data-tab="tab-clients">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Clientes
+        </a>
+        <a href="#" class="nav-link" id="nav-analyzer" data-tab="tab-analyzer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          Analisar Criativo
+        </a>
+        <a href="#" class="nav-link" id="nav-history" data-tab="tab-history">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Histórico Geral
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="provider-selector-box">
+          <label for="select-ai-provider">Provedor de IA</label>
+          <select id="select-ai-provider" class="form-control" style="padding: 6px 10px; font-size: 12px; height: auto; margin-bottom: 12px; background-color: var(--bg-tertiary);">
+            <option value="gemini">Google Gemini</option>
+            <option value="openai">OpenAI GPT</option>
+          </select>
+        </div>
+        <div class="api-status" id="api-status-indicator">
+          <span class="status-dot green"></span>
+          <span class="status-text">Pronto para Analisar</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <h1 class="page-title" id="page-title-text">Painel Geral</h1>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button id="btn-theme-toggle" class="theme-toggle-btn" title="Alternar tema claro/escuro">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+          <div class="user-profile">
+            <div class="user-info">
+              <span class="user-name">Administrador</span>
+              <span class="user-role">Agência de Marketing</span>
+            </div>
+            <div class="avatar">A</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-wrapper">
+
+        <!-- TAB: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Clientes Ativos</span>
+                <h3 class="stat-value" id="stat-total-clients">0</h3>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Criativos Analisados</span>
+                <h3 class="stat-value" id="stat-total-analyses">0</h3>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Taxa de Conversão Média</span>
+                <h3 class="stat-value">+24.8%</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-split">
+            <!-- Left: Quick Actions & Recent Clients -->
+            <div class="dashboard-left">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2 class="card-title">Ações Rápidas</h2>
+                </div>
+                <div class="quick-actions-grid">
+                  <button class="btn btn-primary" id="btn-quick-new-client">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Novo Cliente
+                  </button>
+                  <button class="btn btn-secondary" id="btn-quick-analyze">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    Analisar Criativo
+                  </button>
+                </div>
+              </div>
+
+              <div class="section-card margin-top">
+                <div class="card-header">
+                  <h2 class="card-title">Clientes Recentes</h2>
+                </div>
+                <div class="recent-clients-list" id="dashboard-recent-clients">
+                  <!-- JS populated -->
+                  <div class="empty-state">Nenhum cliente cadastrado. Comece adicionando um!</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: System Insights / Tips -->
+            <div class="dashboard-right">
+              <div class="section-card full-height">
+                <div class="card-header">
+                  <h2 class="card-title">Como Funciona a Memória de IA?</h2>
+                </div>
+                <div class="learning-tips">
+                  <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <div class="tip-content">
+                      <h4>Cadastre o Cliente</h4>
+                      <p>Insira dados de nicho, público-alvo, metas de conversão e tom de voz preferido da marca.</p>
+                    </div>
+                  </div>
+                  <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <div class="tip-content">
+                      <h4>Suba Criativos (Vídeo/Arte)</h4>
+                      <p>A IA do Gemini analisa o gancho inicial, a copy, a legibilidade visual e a chamada para ação (CTA).</p>
+                    </div>
+                  </div>
+                  <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <div class="tip-content">
+                      <h4>Evolução Contínua</h4>
+                      <p>A cada análise, novos aprendizados são extraídos e salvos no banco. As futuras análises serão personalizadas com os aprendizados das campanhas anteriores!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: CLIENTS -->
+        <section id="tab-clients" class="tab-content">
+          <div class="clients-actions-bar">
+            <input type="text" id="input-search-clients" placeholder="Pesquisar por cliente..." class="search-input">
+            <button class="btn btn-primary" id="btn-add-client-modal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Adicionar Cliente
+            </button>
+          </div>
+
+          <!-- Client Grid / List -->
+          <div class="clients-grid" id="clients-list-container">
+            <!-- JS populated cards -->
+          </div>
+
+          <!-- Client Profile View (Dynamic overlay or swap) -->
+          <div id="client-detail-view" class="client-detail-view hidden">
+            <div class="detail-header">
+              <button class="btn-back" id="btn-close-client-detail">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Voltar para Lista
+              </button>
+              <div class="detail-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-edit-client">Editar Dados</button>
+                <button class="btn btn-danger btn-sm" id="btn-delete-client">Excluir</button>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <!-- Left Column: Details & Memory -->
+              <div class="detail-left">
+                <h2 class="detail-title" id="client-detail-name">Nome do Cliente</h2>
+                <div class="niche-badge" id="client-detail-niche">Nicho</div>
+
+                <div class="info-group">
+                  <h3>🎯 Público-Alvo</h3>
+                  <p id="client-detail-audience">Não cadastrado.</p>
+                </div>
+                <div class="info-group">
+                  <h3>🎯 Direcionamento Estratégico</h3>
+                  <div class="goals-grid-display">
+                    <div class="goal-item-display">
+                      <span class="goal-label">Objetivo de Campanha</span>
+                      <span class="goal-value" id="client-detail-objective">Não cadastrado</span>
+                    </div>
+                    <div class="goal-item-display">
+                      <span class="goal-label">Meta / KPI Estrela</span>
+                      <span class="goal-value" id="client-detail-kpi">Não cadastrado</span>
+                    </div>
+                    <div class="goal-item-display">
+                      <span class="goal-label">Verba Mensal</span>
+                      <span class="goal-value" id="client-detail-budget">Não cadastrado</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="info-group">
+                  <h3>🗣️ Tom de Voz da Marca</h3>
+                  <p id="client-detail-voice">Não cadastrado.</p>
+                </div>
+
+                <div class="info-group memory-box">
+                  <h3>🧠 Memória de IA (Aprendizados Acumulados)</h3>
+                  <div class="memory-content" id="client-detail-memory">
+                    Nenhum aprendizado registrado. Suba criativos para analisar e construir a memória deste cliente!
+                  </div>
+                </div>
+
+                <div class="info-group meta-integration-box margin-top">
+                  <h3>📊 Conexão Meta Ads</h3>
+                  <div id="meta-not-configured" class="meta-status-card">
+                    <p class="text-muted" style="font-size: 13px;">Integração com o Meta Ads não configurada para este cliente. Adicione o ID da conta e o Token nas opções de edição.</p>
+                  </div>
+                  <div id="meta-configured" class="meta-status-card hidden">
+                    <button class="btn btn-primary btn-block" id="btn-open-meta-dashboard">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                      Abrir Painel Meta Ads
+                    </button>
+                  </div>
+                </div>
+
+                <div class="info-group onboarding-box margin-top" style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); padding: 16px; border-radius: 12px;">
+                  <h3>📄 Ensinar IA com Briefing (PDF)</h3>
+                  <p class="text-muted" style="font-size: 12px; margin-bottom: 12px; line-height: 1.5;">Suba um PDF (onboarding, briefing ou manual) e a IA definirá o público, objetivos e tom de voz automaticamente.</p>
+                  <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <input type="file" id="input-client-onboard-pdf" accept=".pdf" style="display: none;">
+                    <button class="btn btn-secondary btn-sm" id="btn-trigger-pdf-upload">Selecionar PDF</button>
+                    <span id="selected-pdf-name" class="text-muted" style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Nenhum arquivo selecionado</span>
+                    <button class="btn btn-primary btn-sm hidden" id="btn-upload-onboard-pdf">Processar Documento</button>
+                  </div>
+                  <div id="pdf-processing-status" class="margin-top text-muted hidden" style="font-size: 13px; margin-top: 12px;">
+                    <div style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                      <div class="loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                    </div>
+                    <span id="pdf-status-text">Lendo documento com Gemini...</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Past Analyses History -->
+              <div class="detail-right">
+                <h3 class="section-subtitle">Histórico de Criativos</h3>
+                <div class="client-analyses-list" id="client-detail-analyses">
+                  <!-- List of analysis runs -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Planejador de Nova Campanha (Full Width Section below Grid) -->
+            <div class="section-card margin-top campaign-planner-card">
+              <div class="card-header">
+                <h2 class="card-title">🚀 Planejador de Nova Campanha (Squad AI)</h2>
+              </div>
+              <div class="card-body">
+                <p class="text-muted" style="margin-bottom: 20px;">Suba até 3 criativos (imagens ou vídeos) e insira um contexto para que o Squad planeje a estrutura da sua campanha, públicos e escreva as copys de alta conversão.</p>
+                
+                <div class="planner-form-layout">
+                  <!-- Context input -->
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="input-campaign-context" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">Contexto Adicional da Campanha (opcional):</label>
+                    <input type="text" id="input-campaign-context" class="form-control" placeholder="Ex: Lançamento de inverno, Promoção de 15% em Harmonização, Foco em Lábios...">
+                  </div>
+
+                  <!-- Upload Zone -->
+                  <div class="planner-upload-zone" id="planner-drag-drop-area" style="border: 1px dashed var(--border-color); padding: 32px; border-radius: 12px; text-align: center; background: rgba(255,255,255,0.01); cursor: pointer; transition: var(--transition-smooth);">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon" style="color: var(--primary); margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Arraste e solte até 3 criativos aqui ou <span style="color: var(--primary); font-weight: 600;">clique para selecionar</span></p>
+                    <span class="text-muted" style="font-size: 11px;">Formatos suportados: PNG, JPG, MP4 (máximo 3 arquivos)</span>
+                    <input type="file" id="input-planner-creatives" multiple accept="image/*,video/*" style="display: none;">
+                  </div>
+
+                  <!-- Selected Files Previews -->
+                  <div id="planner-previews-container" class="planner-previews-container hidden" style="margin-top: 16px;">
+                    <!-- Thumbnail preview cards injected here -->
+                  </div>
+
+                  <!-- Submit button -->
+                  <div class="planner-action-bar" style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                    <button class="btn btn-primary" id="btn-run-planner" disabled>Gerar Planejamento de Campanha</button>
+                  </div>
+                </div>
+
+                <!-- Loading state -->
+                <div id="campaign-planner-status" class="planner-loading hidden" style="margin-top: 20px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 12px;">
+                  <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 40px; gap: 16px;">
+                    <div class="loading-spinner"></div>
+                    <p id="planner-status-text" class="text-muted" style="font-size: 14px;">Analisando criativos e estruturando campanha...</p>
+                  </div>
+                </div>
+
+                <!-- Results output -->
+                <div id="campaign-planner-output" class="campaign-planner-output-content hidden" style="margin-top: 20px;">
+                  <hr style="border-color: var(--border-color); margin: 24px 0;">
+                  <div class="section-card-header-clean" style="margin-bottom: 16px;">
+                    <h3 style="font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      📋 Estrutura & Copys Recomendadas pelo Squad
+                    </h3>
+                  </div>
+                  <div id="planner-report-markdown" class="analysis-markdown-body" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Markdown rendered content -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Client Meta Ads Dashboard (Full Page View) -->
+          <div id="client-meta-view" class="client-meta-view hidden">
+            <div class="detail-header">
+              <button class="btn-back" id="btn-close-meta-dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Voltar ao Perfil
+              </button>
+              <div class="detail-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-refresh-meta-dashboard">Atualizar Campanhas</button>
+                <button class="btn btn-primary btn-sm" id="btn-meta-dashboard-report">Gerar Diagnóstico IA</button>
+              </div>
+            </div>
+
+            <div class="meta-dashboard-title-area">
+              <h2 class="detail-title" id="meta-dashboard-client-name">Painel Meta Ads - Nome do Cliente</h2>
+              <div class="niche-badge" id="meta-dashboard-account-id">Conta: act_XXXXXXXXX</div>
+            </div>
+
+            <!-- Aggregate Metrics Cards -->
+            <div class="meta-stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon purple">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label">Investimento Total</span>
+                  <h3 class="stat-value" id="meta-total-spend">R$ 0,00</h3>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon blue">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label">Cliques Totais</span>
+                  <h3 class="stat-value" id="meta-total-clicks">0</h3>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon green">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label">CTR Médio</span>
+                  <h3 class="stat-value" id="meta-avg-ctr">0.00%</h3>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon yellow">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label">CPC Médio</span>
+                  <h3 class="stat-value" id="meta-avg-cpc">R$ 0,00</h3>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="meta-filters-bar">
+              <div class="filter-group">
+                <label for="select-filter-meta-status">Status da Campanha:</label>
+                <select id="select-filter-meta-status" class="form-control">
+                  <option value="ALL">Todos os Status</option>
+                  <option value="ACTIVE">Ativas (ACTIVE)</option>
+                  <option value="PAUSED">Pausadas (PAUSED)</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="select-filter-meta-objective">Objetivo da Campanha:</label>
+                <select id="select-filter-meta-objective" class="form-control">
+                  <option value="ALL">Todos os Objetivos</option>
+                  <option value="OUTREACH">Reconhecimento de Marca / Alcance</option>
+                  <option value="TRAFFIC">Tráfego (Cliques / Landing Page)</option>
+                  <option value="LEADS">Geração de Leads</option>
+                  <option value="CONVERSIONS">Conversões / Vendas</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Main Layout Split: Campaigns on Left, AI report on Right -->
+            <div class="meta-dashboard-layout">
+              <div class="meta-campaigns-section">
+                <div class="section-card-header-clean">
+                  <h3>📢 Campanhas Ativas no Meta Ads</h3>
+                </div>
+                <div id="meta-dashboard-campaigns-list" class="meta-campaigns-list-full">
+                  <div class="empty-state">Clique em "Atualizar Campanhas" para carregar os dados.</div>
+                </div>
+              </div>
+
+              <div class="meta-report-section">
+                <div class="section-card-header-clean">
+                  <h3>🧠 Conversa com o Squad de Elite</h3>
+                </div>
+                
+                <div id="meta-dashboard-report-status" class="meta-report-loading hidden">
+                  <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 32px; gap: 16px;">
+                    <div class="loading-spinner"></div>
+                    <p id="meta-report-status-text" class="text-muted" style="font-size: 14px;">Solicitando parecer do Squad de Tráfego e Copywriting...</p>
+                  </div>
+                </div>
+
+                <!-- Chat layout wrapper -->
+                <div class="squad-chat-container">
+                  <div id="meta-dashboard-report-output" class="squad-chat-messages">
+                    <div class="empty-state">Nenhum diagnóstico gerado ainda. Clique em "Gerar Diagnóstico IA" no topo para consultar o Squad e iniciar a conversa.</div>
+                  </div>
+                  
+                  <!-- Typing indicator -->
+                  <div id="squad-chat-typing" class="squad-chat-typing-bubble hidden">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <span style="margin-left: 8px;">Squad digitando...</span>
+                  </div>
+
+                  <!-- Chat Input Area (Hidden initially) -->
+                  <div id="squad-chat-input-area" class="squad-chat-input-area hidden">
+                    <textarea id="input-squad-chat" class="form-control" placeholder="Fale com o Squad para definir os próximos passos..." rows="2"></textarea>
+                    <button id="btn-send-squad-chat" class="btn btn-primary btn-send-chat" title="Enviar mensagem">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: ANALYZER -->
+        <section id="tab-analyzer" class="tab-content">
+          <div class="analyzer-layout">
+            <!-- Left side: Upload & Configurations -->
+            <div class="analyzer-settings">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2 class="card-title">Nova Análise</h2>
+                </div>
+                
+                <form id="form-analyzer" class="analyzer-form">
+                  <div class="form-group">
+                    <label for="analyzer-client-select">Selecione o Cliente</label>
+                    <select id="analyzer-client-select" class="form-control" required>
+                      <option value="">Selecione um cliente...</option>
+                      <!-- JS populated options -->
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Arquivo do Criativo (Imagem ou Vídeo)</label>
+                    <div class="drag-drop-zone" id="drag-drop-area">
+                      <input type="file" id="file-input-creative" accept="image/*,video/*" class="file-input" required>
+                      <div class="drag-drop-content">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <p class="primary-text">Arraste a arte/vídeo ou clique para procurar</p>
+                        <p class="secondary-text">Suporta JPG, PNG, WEBP, MP4, MOV (Máx. 50MB)</p>
+                      </div>
+                      <div class="file-preview-indicator hidden" id="file-preview-indicator">
+                        <span class="file-name-text" id="preview-file-name">nome_do_arquivo.mp4</span>
+                        <button type="button" class="btn-clear-file" id="btn-clear-selected-file">&times;</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-submit-analysis">
+                    Iniciar Análise Estratégica
+                  </button>
+                </form>
+              </div>
+
+              <!-- Loading overlay / status card -->
+              <div class="loading-card hidden" id="analyzer-loading-status">
+                <div class="spinner-container">
+                  <div class="loading-spinner"></div>
+                </div>
+                <h3 class="loading-title">Analisando Criativo</h3>
+                <p class="loading-desc" id="loading-status-step">Preparando envio da mídia...</p>
+                <div class="loading-progress-bar">
+                  <div class="loading-progress-fill" id="loading-progress-fill"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right side: Visual feedback & Analysis output -->
+            <div class="analyzer-results">
+              <div class="section-card results-card">
+                <div class="card-header">
+                  <h2 class="card-title">Resultado da Análise</h2>
+                </div>
+                
+                <div class="results-placeholder" id="results-placeholder-screen">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="placeholder-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <h3>Pronto para Analisar</h3>
+                  <p>Configure as opções ao lado e suba um criativo para ver a análise estratégica detalhada.</p>
+                </div>
+
+                <div class="results-content-view hidden" id="results-content-view">
+                  <div class="results-split">
+                    <!-- Left: Media player / Image viewer -->
+                    <div class="media-container-box">
+                      <h4>Pré-visualização do Criativo</h4>
+                      <div class="media-viewport" id="media-viewport-container">
+                        <!-- JS injected <img> or <video> -->
+                      </div>
+                    </div>
+
+                    <!-- Right: Analysis Text and updated memory -->
+                    <div class="analysis-text-box">
+                      <div class="analysis-markdown-body" id="analysis-output-markdown">
+                        <!-- Markdown text rendered here -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: HISTORY -->
+        <section id="tab-history" class="tab-content">
+          <div class="history-container">
+            <div class="section-card">
+              <div class="card-header">
+                <h2 class="card-title">Histórico de Análises Realizadas</h2>
+              </div>
+              <div class="history-table-wrapper">
+                <table class="history-table" id="history-table-list">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Cliente</th>
+                      <th>Tipo</th>
+                      <th>Criativo</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-tbody">
+                    <!-- JS populated rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD/EDIT CLIENT -->
+  <div class="modal-backdrop hidden" id="modal-client">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-client-title">Adicionar Novo Cliente</h2>
+        <button class="modal-close" id="btn-close-modal">&times;</button>
+      </div>
+      <form id="form-client">
+        <input type="hidden" id="input-client-id">
+        
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="input-client-name">Nome da Empresa / Marca *</label>
+            <input type="text" id="input-client-name" class="form-control" required placeholder="Ex: Clínica Alpha">
+          </div>
+          <div class="form-group flex-1">
+            <label for="input-client-niche">Nicho de Mercado</label>
+            <input type="text" id="input-client-niche" class="form-control" placeholder="Ex: Odontologia Estética, E-commerce de Moda">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="input-client-meta-id">ID da Conta de Anúncios Meta Ads</label>
+            <input type="text" id="input-client-meta-id" class="form-control" placeholder="Ex: 1234567890 (sem act_)">
+          </div>
+          <div class="form-group flex-1">
+            <label for="input-client-meta-token">Token de Acesso Meta API</label>
+            <input type="password" id="input-client-meta-token" class="form-control" placeholder="Token de acesso da API de anúncios">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-client-audience">Público-Alvo (Persona)</label>
+          <textarea id="input-client-audience" class="form-control rows-3" placeholder="Ex: Mulheres de 25 a 45 anos, classe A/B, interessadas em estética facial rápida..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="input-client-objective">Objetivo de Marketing *</label>
+            <select id="input-client-objective" class="form-control" required>
+              <option value="">Selecione um objetivo...</option>
+              <option value="Direct Response / Venda Direta">Direct Response / Venda Direta</option>
+              <option value="Geração de Leads (Whats/LP)">Geração de Leads (Whats/LP)</option>
+              <option value="Lançamento de Infoproduto">Lançamento de Infoproduto</option>
+              <option value="Tráfego para Negócio Local">Tráfego para Negócio Local</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="input-client-kpi">Meta / KPI Alvo *</label>
+            <input type="text" id="input-client-kpi" class="form-control" required placeholder="Ex: CPL Máximo R$ 5,00 ou ROAS 3x">
+          </div>
+          <div class="form-group flex-1">
+            <label for="input-client-budget">Investimento Mensal *</label>
+            <input type="text" id="input-client-budget" class="form-control" required placeholder="Ex: R$ 5.000/mês">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-client-voice">Diretrizes de Tom de Voz da Marca</label>
+          <textarea id="input-client-voice" class="form-control rows-3" placeholder="Ex: Linguagem profissional porém próxima, usar gatilhos de autoridade, evitar gírias..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="input-client-notes">Memória Inicial / Observações</label>
+          <textarea id="input-client-notes" class="form-control rows-4" placeholder="Adicione qualquer detalhe crucial que a IA deva lembrar no futuro."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-client">Salvar Cadastro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VIEW ANALYSIS DETAILS FROM HISTORY -->
+  <div class="modal-backdrop hidden" id="modal-analysis-detail">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h2 id="modal-analysis-title">Análise Estratégica de Criativo</h2>
+        <button class="modal-close" id="btn-close-analysis-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="results-split">
+          <div class="media-container-box">
+            <h4>Mídia Analisada</h4>
+            <div class="media-viewport" id="modal-media-viewport">
+              <!-- Injected media -->
+            </div>
+          </div>
+          <div class="analysis-text-box">
+            <div class="analysis-markdown-body" id="modal-analysis-text">
+              <!-- Analysis markdown -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-analysis-modal-footer">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
